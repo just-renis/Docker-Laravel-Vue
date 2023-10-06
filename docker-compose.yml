@@ -1,0 +1,68 @@
+version: '3.5'
+
+services:
+  laravel:
+    image: maistoproduktuvaldymosistema-laravel:latest
+    #build:
+    #  context: ./laravel
+    #  dockerfile: Dockerfile-laravel.dockerfile
+    volumes:
+      - ./laravel:/var/www
+    ports:
+      - "9000:9000"
+    environment:
+      - APP_ENV=production
+      - DB_HOST=mysql
+      - DB_PORT=3306
+      - DB_DATABASE=maisto_produktu_sistema
+      - DB_USERNAME=root
+      - DB_PASSWORD=
+    depends_on:
+      - mysql
+    networks:
+      - myNetwork
+    command: php artisan serve --host=0.0.0.0 --port=9000
+
+  vuejs:
+    #image: maistoproduktuvaldymosistema-vuejs:latest
+    build:
+      context: ./vue
+      dockerfile: Dockerfile-vue.dockerfile
+    volumes:
+      - ./vue:/app
+    ports:
+      - "8080:8080"
+    networks:
+      - myNetwork
+
+  mysql:
+    image: mysql:8.1.0
+    volumes:
+      - mysql-data:/var/lib/mysql
+    environment:
+      MYSQL_ALLOW_EMPTY_PASSWORD: "yes"
+      MYSQL_DATABASE: maisto_produktu_sistema
+    ports:
+      - "3306:3306"
+    networks:
+      - myNetwork
+
+  phpmyadmin:
+    image: phpmyadmin/phpmyadmin
+    environment:
+      PMA_HOST: mysql
+      PMA_PORT: 3306
+    ports:
+      - "8081:80"
+    networks:
+      - myNetwork
+    depends_on:
+      - mysql
+
+networks:
+  myNetwork:
+    name: myNetwork
+    driver: bridge
+
+volumes:
+  mysql-data:
