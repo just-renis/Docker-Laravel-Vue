@@ -1,32 +1,32 @@
 import { createStore } from 'vuex';
 import axios from 'axios';
 
-const userModule = {
+const productsModule = {
   state: {
-    message: '',
-    value: null,
+    products: [],
+    products_loading: true
   },
   getters: {
-    GET_MESSAGE(state) { return state.message; },
-    GET_VALUE(state) { return state.value; }
+    GET_PRODUCTS(state) { return state.products; },
+    GET_PRODUCTS_LOADING(state) { return state.products_loading; }
   },
   mutations: {
-    SET_MESSAGE(state, message) {
-      state.message = message;
-    },
-    SET_VALUE(state, value) {
-      state.value = value;
-    },
+    SET_PRODUCTS(state, products) { state.products = products; },
+    SET_PRODUCTS_LOADING(state, status) { state.products_loading = status; }
   },
   actions: {
-    fetchData({ commit }) {
-      return axios.get('http://localhost:9000/api/sample-data')
+    getProducts({ commit }) {
+      commit('SET_PRODUCTS_LOADING', true);
+      return axios.get('http://localhost:9000/products')
         .then(response => {
-          commit('SET_MESSAGE', response.data.message);
-          commit('SET_VALUE', response.data.value);
+          console.log(response.data);
+          commit('SET_PRODUCTS', response.data);
         })
         .catch(error => {
           console.error('Error fetching data:', error);
+        })
+        .finally(() => {
+          commit('SET_PRODUCTS_LOADING', false);
         });
     },
   }
@@ -34,7 +34,7 @@ const userModule = {
 
 const store = createStore({
   modules: {
-    userModule: userModule
+    productsModule: productsModule
   }
 });
 

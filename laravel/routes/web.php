@@ -1,7 +1,7 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
-
+use App\Http\Controllers\ProductController;
 /*
 |--------------------------------------------------------------------------
 | Web Routes
@@ -12,7 +12,9 @@ use Illuminate\Support\Facades\Route;
 | be assigned to the "web" middleware group. Make something great!
 |
 */
-
+Route::group(['prefix' => 'products'], function () {
+    Route::get('/', [ProductController::class, 'getProducts']);
+});
 Route::get('/', function () {
-    return view('welcome');
+    return view('home');
 });
