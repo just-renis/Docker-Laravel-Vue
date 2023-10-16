@@ -1,40 +1,54 @@
 import { createStore } from 'vuex';
 import axios from 'axios';
 
-const productsModule = {
+const categoriesModule = {
   state: {
-    products: [],
-    products_loading: true
+    categories: [],
+    categories_loading: true,
+    filtered_categories: [],
+    maxPrice: 9999,
+    minPrice: 0
   },
   getters: {
-    GET_PRODUCTS(state) { return state.products; },
-    GET_PRODUCTS_LOADING(state) { return state.products_loading; }
+    GET_CATEGORIES(state) { return state.categories; },
+    GET_CATEGORIES_LOADING(state) { return state.categories_loading; },
+    GET_FILTERED_CATEGORIES(state) { return state.filtered_categories; },
+    GET_MAX_PRICE(state) { return state.maxPrice; },
+    GET_MIN_PRICE(state) { return state.minPrice; }
   },
   mutations: {
-    SET_PRODUCTS(state, products) { state.products = products; },
-    SET_PRODUCTS_LOADING(state, status) { state.products_loading = status; }
+    SET_CATEGORIES(state, categories) { state.categories = categories; },
+    SET_CATEGORIES_LOADING(state, status) { state.categories_loading = status; },
+    SET_FILTERED_CATEGORIES(state, filtered_categories) { state.filtered_categories = filtered_categories; },
+    SET_MAX_PRICE(state, maxPrice) { state.maxPrice = maxPrice; },
+    SET_MIN_PRICE(state, minPrice) { state.minPrice = minPrice; }
   },
   actions: {
-    getProducts({ commit }) {
-      commit('SET_PRODUCTS_LOADING', true);
-      return axios.get('http://localhost:9000/products')
+    getCategories({ commit }, filters) {
+      console.log(filters);
+      if (!filters) commit('SET_CATEGORIES_LOADING', true);
+      return axios.get('http://localhost:9000/categories', { params: filters })
         .then(response => {
-          console.log(response.data);
-          commit('SET_PRODUCTS', response.data);
+          commit('SET_CATEGORIES', response.data);
         })
         .catch(error => {
           console.error('Error fetching data:', error);
         })
         .finally(() => {
-          commit('SET_PRODUCTS_LOADING', false);
+          if (!filters) commit('SET_CATEGORIES_LOADING', false);
         });
     },
+    updatePrice({ commit, dispatch }, filters) {
+      commit('SET_MIN_PRICE', filters.minPrice);
+      commit('SET_MAX_PRICE', filters.maxPrice);
+      dispatch('getCategories', filters);
+    }
   }
 }
 
 const store = createStore({
   modules: {
-    productsModule: productsModule
+    categoriesModule: categoriesModule
   }
 });
 

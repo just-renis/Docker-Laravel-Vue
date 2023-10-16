@@ -12,8 +12,8 @@ use App\Http\Controllers\ProductController;
 | be assigned to the "web" middleware group. Make something great!
 |
 */
-Route::group(['prefix' => 'products'], function () {
-    Route::get('/', [ProductController::class, 'getProducts']);
+Route::group(['prefix' => 'categories'], function () {
+    Route::get('/', [ProductController::class, 'getCategories']);
 });
 Route::get('/', function () {
     return view('home');
