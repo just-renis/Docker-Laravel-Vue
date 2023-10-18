@@ -27,7 +27,7 @@ services:
     image: maistoproduktuvaldymosistema-vuejs:latest
     #build:
     #  context: ./vue
-     # dockerfile: Dockerfile-vue.dockerfile
+    #  dockerfile: Dockerfile-vue.dockerfile
     volumes:
       - ./vue:/app
     ports:
@@ -58,6 +58,26 @@ services:
       - myNetwork
     depends_on:
       - mysql
+
+  api:
+    image: my-nodejs-api:latest
+    #build:
+    #  context: ./api
+    #  dockerfile: Dockerfile-api.dockerfile
+    volumes:
+      - ./api:/app
+    ports:
+      - "3001:3001"
+    environment:
+      - DB_HOST=mysql
+      - DB_PORT=3306
+      - DB_DATABASE=maisto_produktu_sistema
+      - DB_USERNAME=root
+      - DB_PASSWORD=
+    depends_on:
+      - mysql
+    networks:
+      - myNetwork
 
 networks:
   myNetwork:
