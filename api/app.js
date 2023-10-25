@@ -19,8 +19,8 @@ db.connect((err) => {
 });
 
 app.get('/api/categories', (req, res) => {
-  const query = `
-  SELECT
+  const query = 
+  `SELECT
     c.id,
     c.name,
     COUNT(p.id) as product_count,
@@ -29,8 +29,7 @@ app.get('/api/categories', (req, res) => {
     ) as products
   FROM categories c
   LEFT JOIN products p ON c.id = p.category_id
-  GROUP BY c.id, c.name
-`;
+  GROUP BY c.id, c.name`;
   db.query(query, (err, results) => {
     if (err) {
       console.error('Error fetching data from MySQL:', err);

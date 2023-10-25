@@ -12,8 +12,8 @@
                 <span class="badge bg-primary rounded-pill">{{ category.product_count }}</span>
               </li>
             </ul>
-            <div class="card-header text-center fw-bold">Price</div>
-            <div class="row mt-2">
+          <div class="card-header text-center fw-bold">Price</div>
+          <div class="row mt-2">
             <div class="col-md-6">
               <div class="input-group mb-3">
                 <input v-model="minPrice" type="number" class="form-control" placeholder="Min">
@@ -54,7 +54,7 @@
 
 <script>
 export default {
-  name: 'MainPage',
+  name: 'MainView',
   data() {
     return {
       minPrice: 0,

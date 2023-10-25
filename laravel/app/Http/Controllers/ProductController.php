@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 
 class ProductController extends Controller
 {
@@ -18,8 +19,7 @@ class ProductController extends Controller
         ->where('products.price', '<=', (float) $request->input('maxPrice', 9999))
         ->groupBy('categories.id')
         ->get();
-
         foreach ($categories as $category) $category->products = json_decode($category->products);
-        return response()->json($categories);
+        return response()->json($categories, 200);
     }
 }
