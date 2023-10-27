@@ -34,15 +34,7 @@
       </div>
       <div class="col-md-8">
         <div class="row row-cols-1 row-cols-md-3 g-4">
-          <div v-for="(product, index) in products" :key="index" class="col">
-            <div class="card product-card h-100">
-              <div class="card-body">
-                <h5 class="card-title product-title">{{ product.name }}</h5>
-                <p class="card-text product-description">{{ product.description }}</p>
-                <p class="card-text product-price">Price: {{ product.price }}€</p>
-              </div>
-            </div>
-          </div>
+          <ProductsComp :products="products"/>
         </div>
       </div>
     </div>
@@ -53,8 +45,12 @@
 </template>
 
 <script>
+import ProductsComp from '../components/ProductsComp.vue';
 export default {
   name: 'MainView',
+  components: {
+    ProductsComp
+  },
   data() {
     return {
       minPrice: 0,
@@ -102,32 +98,5 @@ input[type="number"]::-webkit-outer-spin-button {
 .btn-selected {
   background-color: #007bff;
   color: #fff;
-}
-.product-card {
-  background-color: #f7f7f7;
-  border: 1px solid #e0e0e0;
-  border-radius: 5px;
-  transition: transform 0.2s;
-}
-.product-card:hover {
-  transform: scale(1.03);
-}
-.product-title {
-  font-size: 1rem;
-  font-weight: 600;
-  color: #333;
-}
-.product-description {
-  font-size: 0.75rem;
-  color: #555;
-}
-.product-price {
-  font-size: 0.75rem;
-  font-weight: 600;
-  color: #007bff;
-}
-.card {
-  border: none;
-  box-shadow: 0px 4px 10px rgba(0,0,0,0.1);
 }
 </style>

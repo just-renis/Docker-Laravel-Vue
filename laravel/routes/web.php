@@ -14,15 +14,14 @@ use App\Http\Controllers\ProductController;
 |
 */
 Route::group(['prefix' => 'users'], function () {
-    Route::get('/user', [UserController::class, 'user']);
+    Route::group(['prefix' => '{userId}'], function () {
+        Route::get('/products', [UserController::class, 'getProducts']);
+    });
     Route::post('/register', [UserController::class, 'register']);
     Route::post('/login', [UserController::class, 'login']);
 });
 Route::group(['prefix' => 'categories'], function () {
     Route::get('/', [ProductController::class, 'getCategories']);
-});
-Route::get('/csrfToken', function () {
-    return response()->json(['csrf_token' => csrf_token()]);
 });
 Route::get('/', function () {
     return view('home');

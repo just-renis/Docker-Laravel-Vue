@@ -53,7 +53,7 @@ export default {
     };
   },
   computed: {
-    errors() { return this.$store.getters['GET_ERRORS'] }
+    errors() { return this.$store.getters['GET_USER_ERRORS'] }
   },
   methods: {
     register() {

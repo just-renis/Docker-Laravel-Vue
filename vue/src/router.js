@@ -10,8 +10,8 @@ const routes = [
   { path: '/', component: MainView },
   { path: '/login', component: LoginView, meta: { auth: false} },
   { path: '/register', component: RegisterView, meta: { auth: false} },
-  { path: '/user/products', component: UserProductsView, meta: { auth: true } },
-  { path: '/user/products/add', component: AddProductsView, meta: { auth: true } },
+  { path: '/users/:userId/products', component: UserProductsView, meta: { auth: true } },
+  { path: '/users/:userId/products/add', component: AddProductsView, meta: { auth: true } },
   { path: '/logout', component: { template: '<div></div>' } }
 ];
 
@@ -22,15 +22,23 @@ const router = createRouter({
 
 router.beforeEach((to, from, next) => {
   const isAuthenticated = store.getters['GET_AUTH_TOKEN'];
+  const currentUser = store.getters['GET_USER'];
   if (to.path === '/logout' && isAuthenticated) {
     localStorage.removeItem('auth_token');
+    localStorage.removeItem('user');
     store.commit('SET_AUTH_TOKEN', null);
-    window.location.replace('/');
-    next('/');
+    return next('/');
   }
-  else if ('auth' in to.meta && to.meta.auth && !isAuthenticated) next('/login');
-  else if ('auth' in to.meta && !to.meta.auth && isAuthenticated) next('/user/products');
-  else next();
+
+  if ('auth' in to.meta && to.meta.auth && !isAuthenticated) return next('/login');
+
+  if (to.params.userId && currentUser) {
+    const basePath = `/users/${currentUser.id}/products`;
+    const productsAddPath = `${basePath}/add`;
+    if (to.path === basePath || to.path === productsAddPath) return next();
+    if (to.params.userId !== currentUser.id) return next(basePath);
+  }
+  return next();
 });
 
 export default router;

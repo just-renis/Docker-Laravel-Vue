@@ -1,6 +1,7 @@
 <template>
     <div>
       ADD PRODUCTS
+      <p>User ID: {{ $route.params.userId }}</p>
     </div>
   </template>
   

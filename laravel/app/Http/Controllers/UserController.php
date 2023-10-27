@@ -42,4 +42,11 @@ class UserController extends Controller
         }
         return response()->json(['error' => 'Invalid credentials'], 401);
     }
+
+    public function getProducts($userId)
+    {
+        $user = User::find($userId);
+        if (!$user) return response()->json(['message' => 'User not found'], 404);
+        return response()->json($user->products);
+    }
 }

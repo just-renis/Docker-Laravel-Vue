@@ -12,10 +12,10 @@
             </li>
             <template v-if="isUserAuthenticated">
               <li class="nav-item">
-                <router-link to="/user/products" class="nav-link">My products</router-link>
+                <router-link v-if="user" :to="{ path: `/users/${user.id}/products` }" class="nav-link">My products</router-link>
               </li>
               <li class="nav-item">
-                <router-link to="/user/products/add" class="nav-link">Add products</router-link>
+                <router-link v-if="user" :to="{ path: `/users/${user.id}/products/add` }" class="nav-link">Add products</router-link>
               </li>
               <li class="nav-item">
                 <router-link to="/logout" class="nav-link">Logout</router-link>
@@ -36,6 +36,7 @@
 export default {
     name: 'NavBar',
     computed: {
+        user() { return this.$store.getters['GET_USER']; },
         isUserAuthenticated() { return this.$store.getters['GET_AUTH_TOKEN'];}
     }
 };
