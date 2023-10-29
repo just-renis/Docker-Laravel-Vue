@@ -16,7 +16,7 @@
           </div>
           <div class="d-flex flex-wrap justify-content-between ms-1">
               <div class="price-tag">
-              <span class="price-value">{{ product.price }}€</span>
+              <span class="price-value">{{ (product.price * ((100 - product.discount) / 100)).toFixed(2) }}€</span>
               <span class="discount-value" v-if="product.discount > 0">-{{ product.discount }}%</span>
               </div>
               <div class="d-flex align-items-center pe-2">

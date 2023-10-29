@@ -1,11 +1,11 @@
 <template>
   <div class="container py-5">
-    <div class="row g-4" v-if="!categories_loading">
+    <div class="row g-4" v-if="!categories_with_products_loading">
       <div class="col-md-4">
         <div class="card bg-light mb-3">
           <div class="card-header text-center fw-bold">Categories</div>
             <ul class="list-group list-group-flush">
-              <li v-for="category in categories" :key="category.id" class="list-group-item d-flex justify-content-between align-items-center">
+              <li v-for="category in categories_with_products" :key="category.id" class="list-group-item d-flex justify-content-between align-items-center">
                 <button class="btn btn-light w-100 text-start" @click="toggleCategorySelection(category)" :class="{ 'btn-selected': isCategorySelected(category) }">
                   {{ category.name }}
                 </button>
@@ -54,20 +54,22 @@ export default {
   data() {
     return {
       minPrice: 0,
-      maxPrice: 9999,
+      maxPrice: 99999.99,
       selectedCategories: [],
     };
   },
   computed: {
-    categories_loading() { return this.$store.getters['GET_CATEGORIES_LOADING']; },
-    categories() { return this.$store.getters['GET_CATEGORIES']; },
+    categories_with_products_loading() { return this.$store.getters['GET_CATEGORIES_WITH_PRODUCTS_LOADING']; },
+    categories_with_products() { return this.$store.getters['GET_CATEGORIES_WITH_PRODUCTS']; },
     products() {
-      if (this.selectedCategories.length === 0) return this.categories.reduce((allProducts, category) => allProducts.concat(category.products), []);
-      return this.categories.reduce((allProducts, category) => {
+      if (this.selectedCategories.length === 0) return this.categories_with_products.reduce((allProducts, category) => allProducts.concat(category.products), []);
+      return this.categories_with_products.reduce((allProducts, category) => {
         if (this.isCategorySelected(category)) return allProducts.concat(category.products);
         return allProducts;
       }, []);
     },
+    types() { return this.$store.getters['GET_TYPES']; },
+    types_loading() { return this.$store.getters['GET_TYPES_LOADING']; }
   },
   methods: {
     updatePrice() { this.$store.dispatch('updatePrice', { minPrice: this.minPrice, maxPrice: this.maxPrice }); },
@@ -79,7 +81,8 @@ export default {
     isCategorySelected(category) { return this.selectedCategories.includes(category.id); },
   },
   mounted() {
-    this.$store.dispatch('getCategories');
+    this.$store.dispatch('getCategoriesWithProducts');
+    this.$store.dispatch('getTypes');
   }
 }
 </script>
@@ -90,10 +93,6 @@ input[type="number"]::-webkit-outer-spin-button {
   -webkit-appearance: none;
   appearance: none;
   margin: 0;
-}
-.category-container {
-  border: 1px solid #e0e0e0;
-  box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
 }
 .btn-selected {
   background-color: #007bff;

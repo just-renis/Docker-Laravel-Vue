@@ -15,13 +15,23 @@ use App\Http\Controllers\ProductController;
 */
 Route::group(['prefix' => 'users'], function () {
     Route::group(['prefix' => '{userId}'], function () {
-        Route::get('/products', [UserController::class, 'getProducts']);
+        Route::group(['prefix' => 'products'], function () {
+            Route::get('/', [UserController::class, 'getProducts']);
+            Route::post('/add', [UserController::class, 'addProduct']);
+        });
     });
     Route::post('/register', [UserController::class, 'register']);
     Route::post('/login', [UserController::class, 'login']);
 });
-Route::group(['prefix' => 'categories'], function () {
-    Route::get('/', [ProductController::class, 'getCategories']);
+Route::group(['prefix' => 'resources'], function () {
+    Route::group(['prefix' => 'categories'], function () {
+        Route::get('/', [ProductController::class, 'getCategories']);
+        Route::get('/products', [ProductController::class, 'getCategoriesWithProducts']);
+    });
+    Route::group(['prefix' => 'products'], function () {
+        Route::get('/types', [ProductController::class, 'getTypes']);
+    });
+    
 });
 Route::get('/', function () {
     return view('home');

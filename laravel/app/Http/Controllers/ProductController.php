@@ -8,7 +8,7 @@ use Illuminate\Support\Facades\Log;
 
 class ProductController extends Controller
 {
-    public function getCategories(Request $request)
+    public function getCategoriesWithProducts(Request $request)
     {
         $categories = DB::table('categories')
         ->select('categories.id', 'categories.name')
@@ -18,10 +18,20 @@ class ProductController extends Controller
         products.type, "discount", products.discount)) as products')
         ->leftJoin('products', 'categories.id', '=', 'products.category_id')
         ->where('products.price', '>=', (float) $request->input('minPrice', 0))
-        ->where('products.price', '<=', (float) $request->input('maxPrice', 9999))
+        ->where('products.price', '<=', (float) $request->input('maxPrice', 99999.99))
         ->groupBy('categories.id')
         ->get();
         foreach ($categories as $category) $category->products = json_decode($category->products);
         return response()->json($categories, 200);
+    }
+
+    public function getCategories()
+    {
+        return response()->json(DB::table('categories')->pluck('name'), 200);
+    }
+
+    public function getTypes()
+    {
+        return response()->json(DB::table('products')->distinct()->pluck('type'), 200);
     }
 }
