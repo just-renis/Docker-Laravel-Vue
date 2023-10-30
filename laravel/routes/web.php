@@ -33,6 +33,3 @@ Route::group(['prefix' => 'resources'], function () {
     });
     
 });
-Route::get('/', function () {
-    return view('home');
-});

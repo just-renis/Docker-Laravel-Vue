@@ -4,14 +4,14 @@
       <div class="col-md-4">
         <div class="card bg-light mb-3">
           <div class="card-header text-center fw-bold">Categories</div>
-            <ul class="list-group list-group-flush">
-              <li v-for="category in categories_with_products" :key="category.id" class="list-group-item d-flex justify-content-between align-items-center">
-                <button class="btn btn-light w-100 text-start" @click="toggleCategorySelection(category)" :class="{ 'btn-selected': isCategorySelected(category) }">
-                  {{ category.name }}
-                </button>
-                <span class="badge bg-primary rounded-pill">{{ category.product_count }}</span>
-              </li>
-            </ul>
+          <ul class="list-group list-group-flush">
+            <li v-for="category in categories_with_products" :key="category.id" class="list-group-item d-flex justify-content-between align-items-center">
+              <button class="btn btn-light w-100 text-start" @click="toggleCategorySelection(category)" :class="{ 'btn-selected': isCategorySelected(category) }">
+                {{ category.name }}
+              </button>
+              <span class="badge bg-primary rounded-pill">{{ category.products_count }}</span>
+            </li>
+          </ul>
           <div class="card-header text-center fw-bold">Price</div>
           <div class="row mt-2">
             <div class="col-md-6">
@@ -30,6 +30,15 @@
               <b-button variant="primary" class="btn-sm" @click="updatePrice">Apply price change</b-button>
             </div>
           </div>
+          <div class="card-header text-center fw-bold">Type</div>
+          <ul class="list-group list-group-flush">
+            <li v-for="pType in filteredTypes" :key="pType.type" class="list-group-item d-flex justify-content-between align-items-center">
+              <button class="btn btn-light w-100 text-start" @click="toggleTypeSelection(pType)" :class="{ 'btn-selected': isTypeSelected(pType) }">
+                {{ pType.type }}
+              </button>
+              <span class="badge bg-primary rounded-pill">{{ pType.products_count }}</span>
+            </li>
+          </ul>
         </div>
       </div>
       <div class="col-md-8">
@@ -55,18 +64,27 @@ export default {
     return {
       minPrice: 0,
       maxPrice: 99999.99,
-      selectedCategories: [],
+      selectedCategories: new Set(),
+      selectedTypes: new Set(),
     };
   },
   computed: {
     categories_with_products_loading() { return this.$store.getters['GET_CATEGORIES_WITH_PRODUCTS_LOADING']; },
     categories_with_products() { return this.$store.getters['GET_CATEGORIES_WITH_PRODUCTS']; },
+    filteredTypes() {
+      if (this.selectedCategories.size === 0) return this.types;
+      return this.types.filter(typeObj => new Set(Array.from(this.selectedCategories)
+      .flatMap(category => category.products.map(product => product.type))).has(typeObj.type));
+    },
     products() {
-      if (this.selectedCategories.length === 0) return this.categories_with_products.reduce((allProducts, category) => allProducts.concat(category.products), []);
       return this.categories_with_products.reduce((allProducts, category) => {
-        if (this.isCategorySelected(category)) return allProducts.concat(category.products);
-        return allProducts;
-      }, []);
+      if (this.selectedCategories.size === 0 || this.selectedCategories.has(category)) {
+        return allProducts.concat(category.products.filter((product) => {
+          if (this.selectedTypes.size === 0) return true;
+          return Array.from(this.selectedTypes).some((selectedType) => selectedType.type === product.type);
+        }));
+      }
+      return allProducts;}, []);
     },
     types() { return this.$store.getters['GET_TYPES']; },
     types_loading() { return this.$store.getters['GET_TYPES_LOADING']; }
@@ -74,15 +92,18 @@ export default {
   methods: {
     updatePrice() { this.$store.dispatch('updatePrice', { minPrice: this.minPrice, maxPrice: this.maxPrice }); },
     toggleCategorySelection(category) {
-      const index = this.selectedCategories.indexOf(category.id);
-      if (index === -1) this.selectedCategories.push(category.id);
-      else this.selectedCategories.splice(index, 1);
+      if (this.selectedCategories.has(category)) this.selectedCategories.delete(category);
+      else this.selectedCategories.add(category);
     },
-    isCategorySelected(category) { return this.selectedCategories.includes(category.id); },
+    isCategorySelected(category) { return this.selectedCategories.has(category); },
+    toggleTypeSelection(type) {
+      if (this.selectedTypes.has(type)) this.selectedTypes.delete(type);
+      else this.selectedTypes.add(type);
+    },
+    isTypeSelected(type) { return this.selectedTypes.has(type); },
   },
   mounted() {
     this.$store.dispatch('getCategoriesWithProducts');
-    this.$store.dispatch('getTypes');
   }
 }
 </script>

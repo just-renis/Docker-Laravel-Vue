@@ -88,6 +88,30 @@ class ProductSeeder extends Seeder
                 'seller' => 'Supermarket1234',
                 'category_id' => 1,
             ],
+            [
+                'name' => 'White bread',
+                'description' => 'bready bread',
+                'price' => 99999.99,
+                'quantity' => 50,
+                'weight' => 999000,
+                'type' => 'Breads',
+                'discount' => 0,
+                'producer' => 'Bread farm',
+                'seller' => 'Seller123',
+                'category_id' => 4,
+            ],
+            [
+                'name' => 'Black bread',
+                'description' => 'bread bread',
+                'price' => 5.99,
+                'quantity' => 23,
+                'weight' => 123456,
+                'type' => 'Breads',
+                'discount' => 2,
+                'producer' => 'Bread farm',
+                'seller' => 'Seller123',
+                'category_id' => 4,
+            ]
         ];
 
         foreach ($users as $user) {

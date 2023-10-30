@@ -12,7 +12,7 @@ class ProductController extends Controller
     {
         $categories = DB::table('categories')
         ->select('categories.id', 'categories.name')
-        ->selectRaw('COUNT(products.category_id) as product_count')
+        ->selectRaw('COUNT(products.category_id) as products_count')
         ->selectRaw('JSON_ARRAYAGG(JSON_OBJECT("name", products.name, "price", products.price, "description", 
         products.description, "quantity", products.quantity, "weight", products.weight, "type", 
         products.type, "discount", products.discount)) as products')
@@ -21,8 +21,11 @@ class ProductController extends Controller
         ->where('products.price', '<=', (float) $request->input('maxPrice', 99999.99))
         ->groupBy('categories.id')
         ->get();
-        foreach ($categories as $category) $category->products = json_decode($category->products);
-        return response()->json($categories, 200);
+
+        foreach ($categories as $category) {
+            $category->products = json_decode($category->products);
+        }
+        return response()->json(['categories' => $categories, 'types' => $this->getTypes(true)], 200);
     }
 
     public function getCategories()
@@ -30,8 +33,10 @@ class ProductController extends Controller
         return response()->json(DB::table('categories')->pluck('name'), 200);
     }
 
-    public function getTypes()
+    public function getTypes($isCountNeeded)
     {
-        return response()->json(DB::table('products')->distinct()->pluck('type'), 200);
+        return $isCountNeeded
+        ? DB::table('products')->select('type', DB::raw('count(*) as products_count'))->groupBy('type')->get()
+        : response()->json(DB::table('products')->distinct()->pluck('type'), 200);
     }
 }

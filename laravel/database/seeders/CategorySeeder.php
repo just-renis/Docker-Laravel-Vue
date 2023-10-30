@@ -15,5 +15,6 @@ class CategorySeeder extends Seeder
         Category::create(['name' => 'Fruits']);
         Category::create(['name' => 'Vegetables']);
         Category::create(['name' => 'Nuts']);
+        Category::create(['name' => 'Bread Products']);
     }
 }

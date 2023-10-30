@@ -39,7 +39,9 @@ const mainModule = {
       if (!filters) commit('SET_CATEGORIES_WITH_PRODUCTS_LOADING', true);
       return axios.get('resources/categories/products', { params: filters })
         .then(response => {
-          commit('SET_CATEGORIES_WITH_PRODUCTS', response.data);
+          console.log(response.data.categories);
+          commit('SET_CATEGORIES_WITH_PRODUCTS', response.data.categories);
+          commit('SET_TYPES', response.data.types);
         })
         .catch(error => {
           console.error('Error fetching data:', error);
