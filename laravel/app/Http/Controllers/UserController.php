@@ -55,6 +55,48 @@ class UserController extends Controller
 
     public function addProduct(Request $request, $userId)
     {
+        $this->productValidation($request);
+        $user = User::find($userId);
+        if (!$user) return response()->json(['message' => 'User not found'], 404);
+
+        $data = $request->all();
+        $data['weight'] *= $data['weightType'] === 'kg' ? 1000 : 1;
+        $data['type'] = ucfirst(strtolower($data['type']));
+        $product = new Product($data);
+        $product->category_id = Category::firstOrCreate(['name' => ucfirst(strtolower($data['category']))])->id;
+
+        $user->products()->save($product);
+        return response()->json(['message' => 'Product created successfully'], 201);
+    }
+
+    public function getProductById($userId, $productId)
+    {
+        $product = DB::table('products')
+        ->leftJoin('categories', 'products.category_id', '=', 'categories.id')
+        ->select('products.*', 'categories.name as category')
+        ->where('products.id', $productId)
+        ->where('products.user_id', $userId)
+        ->first();
+        return $product ? response()->json($product, 200) : response()->json(['error' => 'Product not found'], 404);
+    }
+
+    public function editProduct(Request $request, $userId, $productId)
+    {
+        $this->productValidation($request);
+        $product = Product::where('user_id', $userId)->where('id', $productId)->first();
+        if (!$product) return response()->json(['message' => 'Product not found'], 404);
+
+        $data = $request->all();
+        $data['weight'] *= $data['weightType'] === 'kg' ? 1000 : 1;
+        $data['type'] = ucfirst(strtolower($data['type']));
+        $data['category_id'] = Category::firstOrCreate(['name' => ucfirst(strtolower($data['category']))])->id;
+
+        $product->update($data);
+        return response()->json(['message' => 'Product edited successfully'], 200);
+    }
+
+    public function productValidation(Request $request)
+    {
         $maxWeight = $request->input('weightType') === 'g' ? 999999 : 999;
         $request->validate([
             'name' => ['required', 'string', 'max:255'],
@@ -78,16 +120,5 @@ class UserController extends Controller
             'discount.min' => "Discount can't be lower than 0%.",
             'discount.max' => "Discount can't be higher than 99%.",
         ]);
-        $user = User::find($userId);
-        if (!$user) return response()->json(['message' => 'User not found'], 404);
-
-        $data = $request->all();
-        $data['weight'] *= $data['weightType'] === 'kg' ? 1000 : 1;
-        $data['type'] = ucfirst(strtolower($data['type']));
-        $product = new Product($data);
-        $product->category_id = Category::firstOrCreate(['name' => ucfirst(strtolower($data['category']))])->id;
-
-        $user->products()->save($product);
-        return response()->json(['message' => 'Product created successfully'], 201);
     }
 }

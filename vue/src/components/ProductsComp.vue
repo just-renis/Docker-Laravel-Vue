@@ -1,6 +1,10 @@
 <template>
   <div v-for="(product, index) in products" :key="index" class="col-12 col-md-6 col-lg-3">
       <div class="product-card h-100">
+        <div v-if="isOwnerViewing" class="d-flex justify-content-between">
+          <button class="btn btn-primary btn-sm m-2" @click="editProduct(product)"><i class="bi bi-pencil-fill"></i></button>
+          <button class="btn btn-danger btn-sm m-2" @click="deleteProduct(product)"><i class="bi bi-trash3-fill"></i></button>
+        </div>
           <div class="card-body">
           <h5 class="card-title product-title">{{ product.name }}</h5>
           <p class="card-text product-description">{{ product.description }}</p>
@@ -33,7 +37,13 @@
 export default {
   name: 'ProductsComp',
   props: {
-    products: Object
+    products: Object,
+    isOwnerViewing: Boolean
+  },
+  methods: {
+    editProduct(product) {
+      this.$router.push('/users/' + this.$route.params.userId + '/products/' + product.id + '/edit');
+    }
   }
 }
 </script>

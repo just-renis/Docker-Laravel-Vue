@@ -18,6 +18,10 @@ Route::group(['prefix' => 'users'], function () {
         Route::group(['prefix' => 'products'], function () {
             Route::get('/', [UserController::class, 'getProducts']);
             Route::post('/add', [UserController::class, 'addProduct']);
+            Route::group(['prefix' => '{productId}'], function () {
+                Route::get('/', [UserController::class, 'getProductById']);
+                Route::put('/edit', [UserController::class, 'editProduct']);
+            });
         });
     });
     Route::post('/register', [UserController::class, 'register']);
@@ -29,7 +33,6 @@ Route::group(['prefix' => 'resources'], function () {
         Route::get('/products', [ProductController::class, 'getCategoriesWithProducts']);
     });
     Route::group(['prefix' => 'products'], function () {
-        Route::get('/types', [ProductController::class, 'getTypes']);
+        Route::get('/types', [ProductController::class, 'getAllTypes']);
     });
-    
 });

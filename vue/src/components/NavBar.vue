@@ -8,14 +8,14 @@
         <div class="collapse navbar-collapse" id="navbarNav">
           <ul class="navbar-nav ms-auto">
             <li class="nav-item">
-              <router-link to="/" class="nav-link">Home</router-link>
+              <router-link to="/" class="nav-link" exact-active-class="active-link" exact>Home</router-link>
             </li>
             <template v-if="isUserAuthenticated">
               <li class="nav-item">
-                <router-link v-if="user" :to="{ path: `/users/${user.id}/products` }" class="nav-link">My products</router-link>
+                <router-link v-if="user" :to="{ path: `/users/${user.id}/products` }" class="nav-link" exact-active-class="active-link" exact>My products</router-link>
               </li>
               <li class="nav-item">
-                <router-link v-if="user" :to="{ path: `/users/${user.id}/products/add` }" class="nav-link">Add products</router-link>
+                <router-link v-if="user" :to="{ path: `/users/${user.id}/products/add` }" class="nav-link" exact-active-class="active-link" exact>Add products</router-link>
               </li>
               <li class="nav-item">
                 <router-link to="/logout" class="nav-link">Logout</router-link>
@@ -41,3 +41,15 @@ export default {
     }
 };
 </script>
+
+<style scoped>
+.active-link {
+  background-color: #007BFF;
+  color: #fff !important;
+  transition: background-color 0.3s, color 0.3s;
+}
+
+.active-link:hover {
+  background-color: #0056b3;
+}
+</style>

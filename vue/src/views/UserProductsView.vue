@@ -7,7 +7,7 @@
       </div>
     </div>
     <div class="row row-cols-1 row-cols-md-3 g-4 py-5" v-if="!products_loading && products.length !== 0">
-      <ProductsComp :products="products"/>
+      <ProductsComp :products="products" :isOwnerViewing="true"/>
     </div>
     <div v-else-if="!products_loading" class="alert alert-success" role="alert">All your products are sold</div>
     <div v-else class="d-flex justify-content-center mt-5">

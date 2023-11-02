@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
+use App\Models\Product;
 
 class ProductController extends Controller
 {
@@ -25,7 +26,7 @@ class ProductController extends Controller
         foreach ($categories as $category) {
             $category->products = json_decode($category->products);
         }
-        return response()->json(['categories' => $categories, 'types' => $this->getTypes(true)], 200);
+        return response()->json(['categories' => $categories, 'types' => $this->getFilteredTypes($request->input('minPrice', 0), $request->input('maxPrice', 99999.99))], 200);
     }
 
     public function getCategories()
@@ -33,10 +34,16 @@ class ProductController extends Controller
         return response()->json(DB::table('categories')->pluck('name'), 200);
     }
 
-    public function getTypes($isCountNeeded)
+    public function getAllTypes()
     {
-        return $isCountNeeded
-        ? DB::table('products')->select('type', DB::raw('count(*) as products_count'))->groupBy('type')->get()
-        : response()->json(DB::table('products')->distinct()->pluck('type'), 200);
+        return response()->json(DB::table('products')->distinct()->pluck('type'), 200);
+    }
+
+    public function getFilteredTypes($minPrice, $maxPrice)
+    {
+        return DB::table('products')->select('type', DB::raw('count(*) as products_count'))
+        ->where('products.price', '>=', $minPrice)
+        ->where('products.price', '<=', $maxPrice)
+        ->groupBy('type')->get();
     }
 }

@@ -9,8 +9,11 @@ const mainModule = {
     categories_loading: true,
     categories_with_products: [],
     categories_with_products_loading: true,
+    editable_product: null,
+    editable_product_loading: true,
     maxPrice: 9999,
     minPrice: 0,
+    product_error: null,
     types: [],
     types_loading: true
   },
@@ -19,6 +22,9 @@ const mainModule = {
     GET_CATEGORIES_LOADING(state) { return state.categories_loading; },
     GET_CATEGORIES_WITH_PRODUCTS(state) { return state.categories_with_products; },
     GET_CATEGORIES_WITH_PRODUCTS_LOADING(state) { return state.categories_with_products_loading; },
+    GET_EDITABLE_PRODUCT(state) { return state.editable_product; },
+    GET_EDITABLE_PRODUCT_LOADING(state) { return state.editable_product_loading; },
+    GET_PRODUCT_ERROR(state) { return state.product_error; },
     GET_MAX_PRICE(state) { return state.maxPrice; },
     GET_MIN_PRICE(state) { return state.minPrice; },
     GET_TYPES(state) { return state.types; },
@@ -29,8 +35,11 @@ const mainModule = {
     SET_CATEGORIES_LOADING(state, status) { state.categories_loading = status; },
     SET_CATEGORIES_WITH_PRODUCTS(state, categories) { state.categories_with_products = categories; },
     SET_CATEGORIES_WITH_PRODUCTS_LOADING(state, status) { state.categories_with_products_loading = status; },
+    SET_EDITABLE_PRODUCT(state, product) { state.editable_product = product; },
+    SET_EDITABLE_PRODUCT_LOADING(state, status) { state.editable_product_loading = status; },
     SET_MAX_PRICE(state, maxPrice) { state.maxPrice = maxPrice; },
     SET_MIN_PRICE(state, minPrice) { state.minPrice = minPrice; },
+    SET_PRODUCT_ERROR(state, error) { state.product_error = error; },
     SET_TYPES(state, types) { state.types = types; },
     SET_TYPES_LOADING(state, status) { state.types_loading = status; }
   },
@@ -39,7 +48,6 @@ const mainModule = {
       if (!filters) commit('SET_CATEGORIES_WITH_PRODUCTS_LOADING', true);
       return axios.get('resources/categories/products', { params: filters })
         .then(response => {
-          console.log(response.data.categories);
           commit('SET_CATEGORIES_WITH_PRODUCTS', response.data.categories);
           commit('SET_TYPES', response.data.types);
         })
@@ -63,7 +71,7 @@ const mainModule = {
           commit('SET_CATEGORIES_LOADING', false);
         });
     },
-    getTypes({ commit }) {
+    getAllTypes({ commit }) {
       commit('SET_TYPES_LOADING', true);
       return axios.get('resources/products/types')
         .then(response => {
@@ -81,6 +89,20 @@ const mainModule = {
       commit('SET_MAX_PRICE', filters.maxPrice);
       dispatch('getCategoriesWithProducts', filters);
     },
+    getProductById({ commit }, { userId, productId }) {
+      commit('SET_EDITABLE_PRODUCT_LOADING', true);
+      commit('SET_PRODUCT_ERROR', null);
+      return axios.get('users/' + userId + '/products/' + productId)
+        .then(response => {
+          commit('SET_EDITABLE_PRODUCT', response.data);
+        })
+        .catch(error => {
+          commit('SET_PRODUCT_ERROR', error.response.data.error);
+        })
+        .finally(() => {
+          commit('SET_EDITABLE_PRODUCT_LOADING', false);
+        });
+    }
   }
 }
 
@@ -144,7 +166,6 @@ const userModule = {
           else if (error.response.status === 401) commit('SET_USER_ERRORS', error.response.data.error);
         });
     },
-    clearErrors({ commit }) { commit('SET_USER_ERRORS', null); },
     getProducts({ commit }, userId) {
       commit('SET_USER_PRODUCTS_LOADING', true);
       return axios.get('users/' + userId + '/products')
@@ -170,6 +191,19 @@ const userModule = {
           else if (error.response.status === 401) commit('SET_USER_ERRORS', error.response.data.error);
         });
     },
+    editProduct({ commit }, { userId, product }) {
+      commit('SET_USER_ERRORS', null);
+      axios.put('users/' + userId + '/products/' + product.id + '/edit', product)
+        .then(response => {
+          commit('SET_SUCCESS_MESSAGE', response.data.message);
+          router.push('/users/' + userId + '/products');
+        })
+        .catch(error => {
+          if (error.response.status === 422) commit('SET_USER_ERRORS', error.response.data.errors);
+          else if (error.response.status === 401) commit('SET_USER_ERRORS', error.response.data.error);
+        });
+    },
+    clearErrors({ commit }) { commit('SET_USER_ERRORS', null); },
     closeSuccessMessage({ commit }) { commit('SET_SUCCESS_MESSAGE', null); }
   }
 };

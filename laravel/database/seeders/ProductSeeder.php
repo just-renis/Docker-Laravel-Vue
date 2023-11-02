@@ -111,13 +111,25 @@ class ProductSeeder extends Seeder
                 'producer' => 'Bread farm',
                 'seller' => 'Seller123',
                 'category_id' => 4,
+            ],
+            [
+                'name' => 'Milk',
+                'description' => 'Cow milk',
+                'price' => 4.99,
+                'quantity' => 60,
+                'weight' => 1000,
+                'type' => 'Milk',
+                'discount' => 0,
+                'producer' => 'Cow farm',
+                'seller' => 'MilkSeller',
+                'category_id' => 5,
             ]
         ];
 
         foreach ($users as $user) {
             if ($i < count($productsData)) {
-                $user->products()->createMany([$productsData[$i], $productsData[$i + 1]]);
-                $i += 2;
+                $user->products()->createMany([$productsData[$i], $productsData[$i + 1], $productsData[$i + 2]]);
+                $i += 3;
             }
         }
     }

@@ -3,7 +3,8 @@ import MainView from './views/MainView.vue';
 import LoginView from './views/LoginView.vue';
 import RegisterView from './views/RegisterView.vue';
 import UserProductsView from './views/UserProductsView.vue';
-import AddProductsView from './views/AddProductsView.vue';
+import AddProductView from './views/AddProductView.vue';
+import EditProductView from './views/EditProductView.vue';
 import store from './store';
 
 const routes = [
@@ -11,7 +12,8 @@ const routes = [
   { path: '/login', component: LoginView, meta: { auth: false} },
   { path: '/register', component: RegisterView, meta: { auth: false} },
   { path: '/users/:userId/products', component: UserProductsView, meta: { auth: true } },
-  { path: '/users/:userId/products/add', component: AddProductsView, meta: { auth: true } },
+  { path: '/users/:userId/products/add', component: AddProductView, meta: { auth: true } },
+  { path: '/users/:userId/products/:productId/edit', component: EditProductView, meta: { auth: true }},
   { path: '/logout', component: { template: '<div></div>' } }
 ];
 
@@ -35,7 +37,8 @@ router.beforeEach((to, from, next) => {
   if (to.params.userId && currentUser) {
     const basePath = `/users/${currentUser.id}/products`;
     const productsAddPath = `${basePath}/add`;
-    if (to.path === basePath || to.path === productsAddPath) return next();
+    const editProductPath = `${basePath}/${to.params.productId}/edit`;
+    if (to.path === basePath || to.path === productsAddPath || to.path === editProductPath) return next();
     if (to.params.userId !== currentUser.id) return next(basePath);
   }
   return next();
