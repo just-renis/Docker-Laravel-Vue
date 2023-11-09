@@ -17,7 +17,7 @@ app.get('/api/resources/categories/products', (req, res) => {
   `SELECT
     c.id,
     c.name,
-    COUNT(p.id) as product_count,
+    COUNT(p.id) as products_count,
     JSON_ARRAYAGG(
       JSON_OBJECT("name", p.name, "price", p.price, "description", p.description, "quantity", p.quantity, "weight", p.weight, 
       "type", p.type, "producer", p.producer, "seller", p.seller, "discount", p.discount)
@@ -29,7 +29,8 @@ app.get('/api/resources/categories/products', (req, res) => {
 });
 
 app.get('/api/resources/products/types', (req, res) => {
-  db.query('SELECT DISTINCT type FROM products', (err, results) => { err ? res.status(500).json({ error: 'Internal Server Error' }) : res.json(results); });
+  db.query('SELECT DISTINCT type FROM products', (err, results) => { err ? res.status(500).json({ error: 'Internal Server Error' }) : 
+  res.json(results); });
 });
 
 app.get('/api/resources/categories', (req, res) => {
