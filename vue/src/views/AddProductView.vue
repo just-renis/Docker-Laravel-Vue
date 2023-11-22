@@ -20,16 +20,16 @@ export default {
   data() {
     return {
       product: {
-          name: 'a',
-          description: 'a',
-          price: 0.99,
-          quantity: 0,
-          weight: 1,
-          type: 'Apples',
-          producer: 'a',
-          seller: 'a',
-          discount: 0,
-          category: 'Fruits',
+          name: '',
+          description: '',
+          price: '',
+          quantity: '',
+          weight: '',
+          type: '',
+          producer: '',
+          seller: '',
+          discount: '',
+          category: '',
           weightType: 'g'
       },
     }

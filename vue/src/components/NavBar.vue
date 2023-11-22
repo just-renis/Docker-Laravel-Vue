@@ -20,6 +20,9 @@
               <li class="nav-item">
                 <router-link to="/logout" class="nav-link">Logout</router-link>
               </li>
+              <li class="nav-item">
+                <router-link v-if="user" :to="{ path: `/users/${user.id}/basket` }" class="nav-link" exact-active-class="active-link" exact><i class="bi bi-cart"></i></router-link>
+              </li>
             </template>
             <template v-else>
               <li class="nav-item">

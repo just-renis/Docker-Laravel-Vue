@@ -7,7 +7,9 @@ use Illuminate\Support\Facades\Hash;
 use App\Models\User;
 use App\Models\Product;
 use App\Models\Category;
+use App\Models\BasketProduct;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 
 class UserController extends Controller
 {
@@ -69,6 +71,20 @@ class UserController extends Controller
         return response()->json(['message' => 'Product created successfully'], 201);
     }
 
+    public function addProductToBasket($userId, $productId)
+    {
+        $user = User::find($userId);
+        if (!$user) return response()->json(['message' => 'User not found'], 404);
+        $product = Product::find($productId);
+        if (!$product) return response()->json(['message' => 'Product not found'], 404);
+        if ($user->basketProducts->contains('product_id', $productId)) {
+            return response()->json(['message' => 'Product already in basket'], 400);
+        }
+        $product['product_id'] = $productId;
+        $user->basketProducts()->create($product->toArray());
+        return response()->json(['message' => 'Product added to basket successfully'], 201);
+    }
+
     public function getProductById($userId, $productId)
     {
         $product = DB::table('products')
@@ -93,6 +109,42 @@ class UserController extends Controller
 
         $product->update($data);
         return response()->json(['message' => 'Product edited successfully'], 200);
+    }
+
+    public function deleteProduct($userId, $productId)
+    {
+        $product = Product::where('user_id', $userId)->where('id', $productId)->first();
+        if (!$product) return response()->json(['message' => 'Product not found'], 404);
+        $product->delete();
+        return response()->json(['message' => 'Product deleted successfully'], 200);
+    }
+    
+    public function getProductsBasket($userId)
+    {
+        $user = User::find($userId);
+        if (!$user) return response()->json(['message' => 'User not found'], 404);
+        $basketProducts = $user->basketProducts->map(function ($product) {
+            $productArray = $product->toArray();
+            $productArray['quantityToBuy'] = 1;
+            return $productArray;
+        });
+        return response()->json($basketProducts, 200);
+    }
+
+    public function removeProductFromBasket($userId, $productId)
+    {
+        $product = BasketProduct::where('user_id', $userId)->where('id', $productId)->first();
+        if (!$product) return response()->json(['message' => 'Product not found'], 404);
+        $product->delete();
+        return response()->json(['message' => 'Product removed from basket successfully'], 200);
+    }
+
+    public function purchaseProducts(Request $request, $userId)
+    {
+        foreach ($request->json()->all() as $purchaseItem) {
+            Product::where('id', $purchaseItem['product_id'])->decrement('quantity', $purchaseItem['quantityToBuy']);
+        }
+        BasketProduct::where('user_id', $userId)->delete();
     }
 
     public function productValidation(Request $request)

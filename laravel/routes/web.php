@@ -21,6 +21,17 @@ Route::group(['prefix' => 'users'], function () {
             Route::group(['prefix' => '{productId}'], function () {
                 Route::get('/', [UserController::class, 'getProductById']);
                 Route::put('/edit', [UserController::class, 'editProduct']);
+                Route::delete('/delete', [UserController::class, 'deleteProduct']);
+            });
+        });
+        Route::group(['prefix' => 'basket'], function () {
+            Route::group(['prefix' => 'products'], function () {
+                Route::group(['prefix' => '{productId}'], function () {
+                    Route::post('/add', [UserController::class, 'addProductToBasket']);
+                    Route::delete('/delete', [UserController::class, 'removeProductFromBasket']);
+                });
+                Route::post('/purchase', [UserController::class, 'purchaseProducts']);
+                Route::get('/', [UserController::class, 'getProductsBasket']);
             });
         });
     });

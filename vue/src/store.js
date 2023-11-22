@@ -109,6 +109,8 @@ const mainModule = {
 const userModule = {
   state: {
     auth_token: localStorage.getItem('auth_token') !== null && localStorage.getItem('auth_token') !== 'null',
+    products_basket: [],
+    products_basket_loading: true,
     success_message: null,
     user: JSON.parse(localStorage.getItem('user')),
     user_errors: null,
@@ -117,6 +119,8 @@ const userModule = {
   },
   getters: {
     GET_AUTH_TOKEN(state) { return state.auth_token; },
+    GET_PRODUCTS_BASKET(state) { return state.products_basket; },
+    GET_PRODUCTS_BASKET_LOADING(state) { return state.products_basket_loading; },
     GET_SUCCESS_MESSAGE(state) { return state.success_message; },
     GET_USER(state) { return state.user; },
     GET_USER_ERRORS(state) { return state.user_errors; },
@@ -124,11 +128,13 @@ const userModule = {
     GET_USER_PRODUCTS_LOADING(state) { return state.user_products_loading; }
   },
   mutations: {
-    SET_AUTH_TOKEN(state, auth_token) 
-    { 
+    SET_AUTH_TOKEN(state, auth_token)
+    {
       state.auth_token = auth_token;
       localStorage.setItem('auth_token', auth_token);
     },
+    SET_PRODUCTS_BASKET(state, products) { state.products_basket = products; },
+    SET_PRODUCTS_BASKET_LOADING(state, status) { state.products_basket_loading = status; },
     SET_SUCCESS_MESSAGE(state, message) { state.success_message = message; },
     SET_USER(state, user) 
     { 
@@ -179,6 +185,19 @@ const userModule = {
           commit('SET_USER_PRODUCTS_LOADING', false);
         });
     },
+    getProductsBasket({ commit }, userId) {
+      commit('SET_PRODUCTS_BASKET_LOADING', true);
+      return axios.get('users/' + userId + '/basket/products')
+        .then(response => {
+          commit('SET_PRODUCTS_BASKET', response.data);
+        })
+        .catch(error => {
+          console.error('Error fetching data:', error);
+        })
+        .finally(() => {
+          commit('SET_PRODUCTS_BASKET_LOADING', false);
+        });
+    },
     addProduct({ commit }, { userId, product }) {
       commit('SET_USER_ERRORS', null);
       axios.post('users/' + userId + '/products/add', product)
@@ -203,8 +222,52 @@ const userModule = {
           else if (error.response.status === 401) commit('SET_USER_ERRORS', error.response.data.error);
         });
     },
+    deleteProduct({ commit }, { userId, productId }) {
+      axios.delete('users/' + userId + '/products/' + productId + '/delete')
+        .then(response => {
+          commit('SET_SUCCESS_MESSAGE', response.data.message);
+          location.reload();
+        })
+        .catch(error => {
+          if (error.response.status === 422) commit('SET_USER_ERRORS', error.response.data.errors);
+          else if (error.response.status === 401) commit('SET_USER_ERRORS', error.response.data.error);
+        });
+    },
     clearErrors({ commit }) { commit('SET_USER_ERRORS', null); },
-    closeSuccessMessage({ commit }) { commit('SET_SUCCESS_MESSAGE', null); }
+    closeSuccessMessage({ commit }) { commit('SET_SUCCESS_MESSAGE', null); },
+    addProductToBasket({ commit }, { userId, productId }) { 
+      axios.post('users/' + userId + '/basket/products/' + productId + '/add')
+        .then(response => {
+          commit('SET_SUCCESS_MESSAGE', response.data.message);
+          router.push('/');
+        })
+        .catch(error => {
+          if (error.response.status === 422) commit('SET_USER_ERRORS', error.response.data.errors);
+          else if (error.response.status === 401) commit('SET_USER_ERRORS', error.response.data.error);
+        });
+    },
+    removeProductFromBasket({ commit }, { userId, productId }) {
+      axios.delete('users/' + userId + '/basket/products/' + productId + '/delete')
+        .then(response => {
+          commit('SET_SUCCESS_MESSAGE', response.data.message);
+          location.reload();
+        })
+        .catch(error => {
+          if (error.response.status === 422) commit('SET_USER_ERRORS', error.response.data.errors);
+          else if (error.response.status === 401) commit('SET_USER_ERRORS', error.response.data.error);
+        });
+    },
+    purchaseProducts({ commit }, { userId, data }) {
+      axios.post('users/' + userId + '/basket/products/purchase', data)
+        .then(response => {
+          commit('SET_SUCCESS_MESSAGE', response.data.message);
+          location.reload();
+        })
+        .catch(error => {
+          if (error.response.status === 422) commit('SET_USER_ERRORS', error.response.data.errors);
+          else if (error.response.status === 401) commit('SET_USER_ERRORS', error.response.data.error);
+        });
+    }
   }
 };
 

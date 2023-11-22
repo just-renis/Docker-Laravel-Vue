@@ -43,7 +43,7 @@
       </div>
       <div class="col-md-8">
         <div class="row row-cols-1 row-cols-md-3 g-4">
-          <ProductsComp :products="products"/>
+          <ProductsComp :products="products" :canBuy="registeredUser ? true : false"/>
         </div>
       </div>
     </div>
@@ -72,27 +72,28 @@ export default {
     categories_with_products_loading() { return this.$store.getters['GET_CATEGORIES_WITH_PRODUCTS_LOADING']; },
     categories_with_products() { return this.$store.getters['GET_CATEGORIES_WITH_PRODUCTS']; },
     filteredTypes() {
-    if (this.selectedCategoryIds.size === 0) return this.types;
-    return this.types.filter(type => {
-      return new Set(Array.from(this.selectedCategoryIds)
-        .flatMap(categoryId => {
-          const category = this.categories_with_products.find(cat => cat.id === categoryId);
-          return category ? category.products.map(product => product.type) : [];
-        })
-      ).has(type.type);
-    });
-  },
-  products() {
-    return this.categories_with_products.reduce((allProducts, category) => {
-      if (this.selectedCategoryIds.size === 0 || this.selectedCategoryIds.has(category.id)) {
-        return allProducts.concat(category.products.filter((product) => {
-          if (this.selectedTypes.size === 0) return true;
-          return Array.from(this.selectedTypes).some((selectedType) => selectedType === product.type);
-        }));
-      }
-      return allProducts;
-    }, []);
-  },
+      if (this.selectedCategoryIds.size === 0) return this.types;
+      return this.types.filter(type => {
+        return new Set(Array.from(this.selectedCategoryIds)
+          .flatMap(categoryId => {
+            const category = this.categories_with_products.find(cat => cat.id === categoryId);
+            return category ? category.products.map(product => product.type) : [];
+          })
+        ).has(type.type);
+      });
+    },
+    registeredUser() { return this.$store.getters['GET_USER'];},
+    products() {
+      return this.categories_with_products.reduce((allProducts, category) => {
+        if (this.selectedCategoryIds.size === 0 || this.selectedCategoryIds.has(category.id)) {
+          return allProducts.concat(category.products.filter((product) => {
+            if (this.selectedTypes.size === 0) return true;
+            return Array.from(this.selectedTypes).some((selectedType) => selectedType === product.type);
+          }));
+        }
+        return allProducts;
+      }, []);
+    },
     types() { return this.$store.getters['GET_TYPES']; },
     types_loading() { return this.$store.getters['GET_TYPES_LOADING']; }
   },

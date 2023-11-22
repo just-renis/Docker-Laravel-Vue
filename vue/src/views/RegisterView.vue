@@ -7,7 +7,7 @@
           <div class="card-body">
             <form @submit.prevent="register">
               <div class="input-group mb-3">
-                <span class="input-group-text">Company Name:</span>
+                <span class="input-group-text">Company Name / Username:</span>
                 <input v-model="company_name" type="text" class="form-control" required>
               </div>
               <div v-if="errors && errors.company_name" class="alert alert-danger">{{ errors.company_name[0] }}</div>

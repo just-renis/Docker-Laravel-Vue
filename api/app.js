@@ -37,4 +37,15 @@ app.get('/api/resources/categories', (req, res) => {
   db.query('SELECT name FROM categories', (err, results) => { err ? res.status(500).json({ error: 'Internal Server Error' }) : res.json(results); });
 });
 
+app.get('/api/resources/products/:productId', (req, res) => {
+  const productId = req.params.productId;
+  db.query('SELECT * FROM products WHERE id = ?', [productId], (err, results) => {
+    if (err) res.status(500).json({ error: 'Internal Server Error' });
+    else {
+      if (results.length > 0) res.json(results[0]);
+      else res.status(404).json({ error: 'Product not found' });
+    }
+  });
+});
+
 app.listen(port, () => { console.log(`API server is running on port ${port}`); });

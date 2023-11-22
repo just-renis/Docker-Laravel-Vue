@@ -14,7 +14,7 @@ class ProductController extends Controller
         $categories = DB::table('categories')
         ->select('categories.id', 'categories.name')
         ->selectRaw('COUNT(products.category_id) as products_count')
-        ->selectRaw('JSON_ARRAYAGG(JSON_OBJECT("name", products.name, "price", products.price, "description", 
+        ->selectRaw('JSON_ARRAYAGG(JSON_OBJECT("id", products.id, "name", products.name, "price", products.price, "description", 
         products.description, "quantity", products.quantity, "weight", products.weight, "type", 
         products.type, "discount", products.discount)) as products')
         ->leftJoin('products', 'categories.id', '=', 'products.category_id')
